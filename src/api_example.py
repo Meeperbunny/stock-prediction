@@ -21,7 +21,7 @@ def plot_stock(target_name, day_range, interval='D', smooth_val=1):
     res = finnhub_client.stock_candles(target_name, interval, lowerUnix, upperUnix)
 
     avg = np.array(res['h']) + np.array(res['l'])
-    x = np.arange(1, len(avg) + 1)
+    x = np.array(res['t'])
 
     smoothedVals = []
     rollingSum = 0
@@ -38,4 +38,4 @@ def plot_stock(target_name, day_range, interval='D', smooth_val=1):
     plt.plot(x, smoothAvg, color ="green")
     plt.show()
 
-plot_stock("AAPL", 60, interval='D')
+plot_stock("AAPL", 30, interval='60')
