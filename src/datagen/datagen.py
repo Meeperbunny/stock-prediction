@@ -3,7 +3,7 @@ import finnhub, numpy as np, time, datetime, os, sys, json
 if len(sys.argv) != 4:
     print("----------------------------")
     print("Invalid number of arguments.")
-    print("py datagen.py <NAME> <INTERVAL> <DAY_RANGE>")
+    print("py datagen.py <NAME> <INTERVAL> <TIME_RANGE>")
     exit()
 
 # Setup client
@@ -22,7 +22,7 @@ def get_data(target_name, interval, time_range):
         daydelta = int(time_range[1:])
     else: 
         print("Invalid range formatting:")
-        print("Example: m10 : 10 minutes, h50 : 50 hours, 1d : 1 day")
+        print("Example: m10 : 10 minutes, h50 : 50 hours, d1 : 1 day")
         exit()
 
     upperTime = datetime.datetime.now()
@@ -43,7 +43,7 @@ time_range = sys.argv[3]
 data = get_data(target_name, interval, time_range)
 
 # Store data in file
-script_dir = os.path.join(os.path.dirname(__file__), "data") # directory of script
+script_dir = os.path.join(os.path.dirname(__file__), "../../data") # directory of script
 
 # Check if data folder exists, otherwise create it
 
