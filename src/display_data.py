@@ -27,15 +27,42 @@ d_low = d_low.rename(columns={'l': 'val'})
 d_high = d_high.rename(columns={'h': 'val'})
 d_avg['val'] = d_avg.apply(lambda x: (x['l'] + x['h']) / 2, axis=1)
 
-d_range = pd.concat([d_low, d_high, d_avg], ignore_index=True)
-print(d_range)
+# Bands
+d_band_high = d_avg.copy()
+d_band_low = d_avg.copy()
+d_band_high['sec'] = d_avg.apply(lambda x: 'boll_high', axis=1)
+d_band_low['sec'] = d_avg.apply(lambda x: 'boll_low', axis=1)
+std_dev_arr = []
+
+rolling_count = 10
+for i, n in enumerate(d_band_high['val']):
+    rel = np.array([])
+    for q in range(i - 10, i + 1):
+        if q >= 0:
+            rel = np.append(rel, d_band_high['val'][q])
+    
+    mean = np.sum(rel) / len(rel)
+    std_dev = np.sqrt(np.sum(np.square(rel - mean) / len(rel)))
+    std_dev_arr.append(std_dev)
+
+
+# Apply to dataframes
+boll_range = 6
+
+d_band_high['std_dev'] = pd.Series(std_dev_arr, index=d_band_high.index)
+d_band_low['std_dev'] = pd.Series(std_dev_arr, index=d_band_low.index)
+
+d_band_high['val'] = d_band_high.apply(lambda x: x['val'] + x['std_dev'] * boll_range, axis=1)
+d_band_low['val'] = d_band_low.apply(lambda x: x['val'] - x['std_dev'] * boll_range, axis=1)
+
+d_range = pd.concat([d_band_low, d_low, d_high, d_avg, d_band_high], ignore_index=True)
 
 sns.set_style("darkgrid", {"grid.color": ".6", "grid.linestyle": ":"})
 
 plt.style.use("dark_background")
-sns.relplot(x="t", y="val", kind="line", hue='sec', data=d_range, palette=["#00ff00", "#ff0000", "#add8e6"])
+sns.relplot(x="t", y="val", kind="line", hue='sec', data=d_range, palette=["#ffffff", "#00ff00", "#ff0000", "#add8e6", "#ffffff"])
 
-manager = plt.get_current_fig_manager()
-manager.full_screen_toggle()
+# manager = plt.get_current_fig_manager()
+# manager.full_screen_toggle()
 plt.show()
 

@@ -43,12 +43,16 @@ time_range = sys.argv[3]
 data = get_data(target_name, interval, time_range)
 
 # Store data in file
-script_dir = os.path.join(os.path.dirname(__file__), "../../data") # directory of script
+script_dir = os.path.join(os.path.dirname(__file__), "../data") # directory of script
 
 # Check if data folder exists, otherwise create it
 
 if not os.path.isdir(script_dir):
     os.mkdir(script_dir)
+
+if data['s'] == None:
+    print("No data found.")
+    exit()
 
 file_name = target_name + "-" + interval + "-" + time_range + "-" + str(data['t'][-1]) + ".json"
 file_dir = os.path.join(script_dir, file_name)
