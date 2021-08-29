@@ -1,6 +1,6 @@
 import sys, os
-from reader.reader import get_data
-from pred.pred import process
+from reader.reader import get_data_avg
+from pred import process
 
 def get_total(money, shares, share_price):
     return money + shares * share_price
@@ -16,7 +16,7 @@ if len(sys.argv) != 2:
     exit()
 
 file_name = sys.argv[1]
-prices = get_data(file_name)
+prices = get_data_avg(file_name)
 
 for i, n in enumerate(prices):
     if i == 0:
@@ -40,4 +40,5 @@ for i, n in enumerate(prices):
 
 print("Final Results:\n\tMoney: " + str(base) + "\n\tShares: " + str(amount) + "\n\tTotal: " + str(log[-1]))
 
-print("Algorithm made: " + str(format(log[-1] / starting,".8f")))
+print("Algorithm made: ---- " + str(format(log[-1] / starting,".8f")))
+print("Base is: ----------- " + str(format(prices[-1] / prices[0],".8f")))

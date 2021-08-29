@@ -4,6 +4,11 @@ import json, sys, numpy as np
 
 def get_data(file_name):
     infile = open(file_name, 'r')
+    return json.load(infile)
+
+
+def get_data_avg(file_name):
+    infile = open(file_name, 'r')
     data = json.load(infile)
     avg = (np.array(data['h']) + np.array(data['l'])) / 2
     return avg
