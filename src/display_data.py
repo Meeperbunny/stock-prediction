@@ -4,6 +4,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+## SETTINGS ##
+
+rectangles = True
+highlow = True
+openclose = True
+
+##############
+
 if len(sys.argv) != 2:
     print("----------------------------")
     print("Invalid number of arguments.")
@@ -63,32 +71,48 @@ d_band_low['val'] = d_band_low.apply(lambda x: x['val'] - x['std_dev'] * boll_ra
 
 d_range = pd.concat([d_band_low, d_avg, d_band_high], ignore_index=True)
 
+# Colors
+base_pal = ["#ffffff", "#00FFFF", "#ffffff"]
+
+if highlow:
+    d_range = pd.concat([d_high, d_low, d_range], ignore_index=True)
+    base_pal.insert(0, "#ff0000")
+    base_pal.insert(0, "#00ff00")
+
+if openclose:
+    d_range = pd.concat([d_open, d_close, d_range], ignore_index=True)
+    base_pal.insert(0, "#ea00ff")
+    base_pal.insert(0, "#fff300")
+
 sns.set_style("darkgrid", {"grid.color": ".6", "grid.linestyle": ":"})
 
 plt.style.use("dark_background")
-sns.relplot(x="t", y="val", kind="line", hue='sec', data=d_range, palette=["#ffffff", "#add8e6", "#ffffff"])
 
-width = 300
-for i in range(len(d_open['val'])):
-    open_price = d_open['val'][i]
-    close_price = d_close['val'][i]
-    high_val = d_high['val'][i]
-    low_val = d_low['val'][i]
+sns.relplot(x="t", y="val", kind="line", hue='sec', data=d_range, palette=base_pal)
 
-    timestamp = d_open['t'][i]
-    color = "#ff0000"
-    if open_price < close_price:
-        color = "#00ff00"
 
-    # Draw rectangle
-    plt.plot([timestamp + width / 2, timestamp - width / 2], [open_price, open_price], color=color)
-    plt.plot([timestamp + width / 2, timestamp - width / 2], [close_price, close_price], color=color)
+if rectangles:
+    width = 300
+    for i in range(len(d_open['val'])):
+        open_price = d_open['val'][i]
+        close_price = d_close['val'][i]
+        high_val = d_high['val'][i]
+        low_val = d_low['val'][i]
 
-    plt.plot([timestamp + width / 2, timestamp + width / 2], [open_price, close_price], color=color)
-    plt.plot([timestamp - width / 2, timestamp - width / 2], [open_price, close_price], color=color)
+        timestamp = d_open['t'][i]
+        color = "#ff0000"
+        if open_price < close_price:
+            color = "#00ff00"
 
-    # Draw centerline
-    plt.plot([timestamp, timestamp], [high_val, low_val], color=color)
+        # Draw rectangle
+        plt.plot([timestamp + width / 2, timestamp - width / 2], [open_price, open_price], color=color)
+        plt.plot([timestamp + width / 2, timestamp - width / 2], [close_price, close_price], color=color)
+
+        plt.plot([timestamp + width / 2, timestamp + width / 2], [open_price, close_price], color=color)
+        plt.plot([timestamp - width / 2, timestamp - width / 2], [open_price, close_price], color=color)
+
+        # Draw centerline
+        plt.plot([timestamp, timestamp], [high_val, low_val], color=color)
 
 
 
