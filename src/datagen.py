@@ -50,7 +50,7 @@ script_dir = os.path.join(os.path.dirname(__file__), "../data") # directory of s
 if not os.path.isdir(script_dir):
     os.mkdir(script_dir)
 
-if data['s'] == None:
+if data['s'] == 'no_data':
     print("No data found.")
     exit()
 
