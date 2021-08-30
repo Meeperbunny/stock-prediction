@@ -10,6 +10,10 @@ rectangles = True
 highlow = True
 openclose = True
 
+rolling_count = 30
+boll_range = 2
+width = 0.5
+
 ##############
 
 if len(sys.argv) != 2:
@@ -20,6 +24,10 @@ if len(sys.argv) != 2:
 
 data_file = sys.argv[1]
 data = get_data(data_file)
+
+# Change time val to respect missing days
+for n in range(len(data['t'])):
+    data['t'][n] = n
 
 d = pd.DataFrame(data=data)
 d_low = d.filter(['l','t'], axis=1)
@@ -48,7 +56,6 @@ d_band_high['sec'] = d_avg.apply(lambda x: 'boll_high', axis=1)
 d_band_low['sec'] = d_avg.apply(lambda x: 'boll_low', axis=1)
 std_dev_arr = []
 
-rolling_count = 30
 for i, n in enumerate(d_band_high['val']):
     rel = np.array([])
     for q in range(i - 10, i + 1):
@@ -61,7 +68,6 @@ for i, n in enumerate(d_band_high['val']):
 
 
 # Apply to dataframes
-boll_range = 2
 
 d_band_high['std_dev'] = pd.Series(std_dev_arr, index=d_band_high.index)
 d_band_low['std_dev'] = pd.Series(std_dev_arr, index=d_band_low.index)
@@ -92,7 +98,6 @@ sns.relplot(x="t", y="val", kind="line", hue='sec', data=d_range, palette=base_p
 
 
 if rectangles:
-    width = 300
     for i in range(len(d_open['val'])):
         open_price = d_open['val'][i]
         close_price = d_close['val'][i]
