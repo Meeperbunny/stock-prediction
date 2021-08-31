@@ -7,8 +7,9 @@ import seaborn as sns
 ## SETTINGS ##
 
 rectangles = True
-highlow = True
-openclose = True
+highlow = False
+openclose = False
+bollbands = True
 
 rolling_count = 30
 boll_range = 2
@@ -32,13 +33,13 @@ for n in range(len(data['t'])):
 d = pd.DataFrame(data=data)
 d_low = d.filter(['l','t'], axis=1)
 d_high = d.filter(['h','t'], axis=1)
-d_avg = d.filter(['l', 'h','t'], axis=1)
+d_avg = d.filter(['l', 'h', 'c', 't'], axis=1)
 d_open = d.filter(['o','t'], axis=1)
 d_close = d.filter(['c','t'], axis=1)
 
 d_low['sec'] = d_low.apply(lambda x: 'low', axis=1)
 d_high['sec'] = d_high.apply(lambda x: 'high', axis=1)
-d_avg['sec'] = d_avg.apply(lambda x: 'avg', axis=1)
+d_avg['sec'] = d_avg.apply(lambda x: 'price', axis=1)
 d_open['sec'] = d_avg.apply(lambda x: 'opening', axis=1)
 d_close['sec'] = d_avg.apply(lambda x: 'closing', axis=1)
 
@@ -47,7 +48,7 @@ d_low = d_low.rename(columns={'l': 'val'})
 d_high = d_high.rename(columns={'h': 'val'})
 d_open = d_open.rename(columns={'o': 'val'})
 d_close = d_close.rename(columns={'c': 'val'})
-d_avg['val'] = d_avg.apply(lambda x: (x['l'] + x['h']) / 2, axis=1)
+d_avg['val'] = d_avg.apply(lambda x: (x['l'] + x['h'] + x['c']) / 3, axis=1)
 
 # Bands
 d_band_high = d_avg.copy()
@@ -75,10 +76,15 @@ d_band_low['std_dev'] = pd.Series(std_dev_arr, index=d_band_low.index)
 d_band_high['val'] = d_band_high.apply(lambda x: x['val'] + x['std_dev'] * boll_range, axis=1)
 d_band_low['val'] = d_band_low.apply(lambda x: x['val'] - x['std_dev'] * boll_range, axis=1)
 
-d_range = pd.concat([d_band_low, d_avg, d_band_high], ignore_index=True)
+d_range = d_avg
 
 # Colors
-base_pal = ["#ffffff", "#00FFFF", "#ffffff"]
+base_pal = ["#00FFFF"]
+
+if bollbands:
+    d_range = pd.concat([d_band_low, d_avg, d_band_high], ignore_index=True)
+    base_pal.insert(0, "#ffffff")
+    base_pal.append("#ffffff")
 
 if highlow:
     d_range = pd.concat([d_high, d_low, d_range], ignore_index=True)
